@@ -7,9 +7,28 @@ global:
   evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
   # scrape_timeout is set to the global default (10s).
 
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - alertmanager:9093
 
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "alert.rules"
+
+  # Configuring Prometheus to monitor itself - https://prometheus.io/docs/prometheus/latest/getting_started/
 scrape_configs:
+  - job_name: 'prometheus'
+    # Override the global values and scrape targets for this job every 10 seconds.
+    scrape_interval: 10s
+    static_configs:
+      # Execute query expressions prometheus_abc_xyz
+      - targets: ['localhost:9090']
+
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
   - job_name: "node"
+    scrape_interval: 10s
     static_configs:
     - targets: ["node-exporter:9100"]
